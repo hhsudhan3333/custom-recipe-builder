@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import {User} from "../models/userModel";
 import { AuthRequest } from "../middlewares/authMiddleware";
 
-// GET
 export const getProfile = async (req: Request, res: Response): Promise<void> => {
   const authReq = req as unknown as AuthRequest;
   const user = authReq.user;
@@ -43,7 +42,6 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// PUT 
 export const updateProfile = async (req: Request, res: Response): Promise<void> => {
   const authReq = req as unknown as AuthRequest;
   const user = authReq.user;

@@ -13,7 +13,7 @@ if (!fs.existsSync(uploadDir)) {
 }
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir); // make sure /uploads exists
+    cb(null, uploadDir); 
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
@@ -22,11 +22,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Why this base path? We'll mount as /api/recipes in server
+
 router.post("/add", authMiddleware, addRecipe);
-router.get("/", getAllRecipes); // read all (public; supports ?mine=true)
+router.get("/", getAllRecipes); 
 router.get("/:id", getRecipeById);
-router.put("/:id", authMiddleware, updateRecipe); // update (protected + ownership)
-router.delete("/:id", authMiddleware, deleteRecipe); // delete (protected + ownership)
+router.put("/:id", authMiddleware, updateRecipe);
+router.delete("/:id", authMiddleware, deleteRecipe); 
 
 export default router;

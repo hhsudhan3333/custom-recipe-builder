@@ -13,7 +13,7 @@ const categorySchema: Schema<ICategory> = new Schema(
     name: { type: String, required: true, unique: true, trim: true },
     slug: { type: String, unique: true, lowercase: true },
   },
-  { timestamps: true }
+  { timestamps: true, _id: false }
 );
 
 

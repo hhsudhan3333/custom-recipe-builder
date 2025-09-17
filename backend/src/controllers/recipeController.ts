@@ -121,7 +121,7 @@ export const getRecipeById = async (req: Request, res: Response) => {
         ingredients: recipe.ingredients,
         steps: recipe.steps,
         category: recipe.category,
-        author: recipe.createdBy, // { id, name }
+        author: recipe.createdBy, 
       },
     });
   } catch (err) {
@@ -137,78 +137,76 @@ export const getRecipeById = async (req: Request, res: Response) => {
 export const updateRecipe = async (req: Request, res: Response) => {
   const authReq = req as AuthRequest;
   try {
-    if (!authReq.user || typeof authReq.user === "string") return res.status(401).json({ message: "Unauthorized" });
+    if (!authReq.user || typeof authReq.user === "string") {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+        data: [],
+      });
+    }
+
     const { id: userId } = authReq.user as { id: string };
-    const { id } = req.params;
+    const { id } = req.params; 
 
-    if (!mongoose.isValidObjectId(id)) return res.status(400).json({
-          success: false,
-          message: "Invalid recipeId",
-          data: [],
-    });
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Recipe id is required",
+        data: [],
+      });
+    }
 
-    const { title, description, ingredients, steps, categoryId, categorySlug } = req.body;
+    const {
+      title,
+      description,
+      ingredients,
+      steps,
+      category,
+      cookTime,
+      servings,
+      image,
+      nutrition,
+    } = req.body;
     const update: Record<string, any> = {};
     if (title !== undefined) update.title = title;
     if (description !== undefined) update.description = description;
-    if (ingredients !== undefined) {
-    if (!Array.isArray(ingredients) || ingredients.length === 0) {
-      return res.status(400).json({ 
-          success: false,
-          message: "ingredients must be a non-empty array",
-          data: [],
+    if (ingredients !== undefined) update.ingredients = ingredients;
+    if (steps !== undefined) update.steps = steps;
+    if (category !== undefined) update.category = category;
+    if (cookTime !== undefined) update.cookTime = cookTime;
+    if (servings !== undefined) update.servings = servings;
+    if (image !== undefined) update.image = image;
+    if (nutrition !== undefined) update.nutrition = nutrition;
+
+    const updated = await Recipe.findOneAndUpdate(
+      { id: id, createdBy: userId },
+      { $set: update },
+      { new: true }
+    ).populate("category", "id name slug");
+
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: "Recipe not found or not owned by you",
+        data: [],
       });
-      }
-      update.ingredients = ingredients;
     }
 
-    if (steps !== undefined) {
-      if (!Array.isArray(steps) || steps.length === 0) {
-        return res.status(400).json({
-          success: false,
-          message: "steps must be a non-empty array",
-          data: [],
-        });
-      }
-      update.steps = steps;
-    }
-
-    if (categoryId || categorySlug) {
-      let categoryDoc = null;
-      if (categoryId) {
-        if (!mongoose.isValidObjectId(categoryId)) return res.status(400).json({
-          success: false,
-          message: "Invalid categoryId",
-          data: [],
-        });
-        categoryDoc = await Category.findById(categoryId);
-      } else {
-        categoryDoc = await Category.findOne({ slug: String(categorySlug).toLowerCase() });
-      }
-      if (!categoryDoc) return res.status(400).json({
-          success: false,
-          message: "Category not found",
-          data: [],
-      });
-      update.category = categoryDoc.id;
-    }
-
-    const updated = await Recipe.findOneAndUpdate({ id: id, createdBy: userId }, { $set: update }, { new: true }).populate("category", "name slug");
-    if (!updated) return res.status(404).json({         
-          success: false,
-          message: "Recipe not found or not owned by you",
-          data: [],});
-
-    return res.json({ success: true, data: updated });
+    return res.json({
+      success: true,
+      message: "Recipe updated successfully",
+      data: updated,
+    });
   } catch (err) {
     console.error("updateRecipe error:", err);
     return res.status(500).json({
-        success: false,
-        message: "Server Error",
-        data: [], 
+      success: false,
+      message: "Server Error",
+      data: [],
     });
   }
 };
+
 
 export const deleteRecipe = async (req: Request, res: Response) => {
   const authReq = req as AuthRequest;

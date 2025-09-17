@@ -84,8 +84,6 @@ export const getSavedRecipes = async (req: Request, res: Response) => {
 export const deleteSavedRecipe = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-
-    // UUID based delete
     const deleted = await UserAction.findOneAndDelete({ id });
 
     if (!deleted) {

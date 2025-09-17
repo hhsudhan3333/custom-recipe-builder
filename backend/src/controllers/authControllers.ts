@@ -37,7 +37,7 @@ export const registerUser = async (req: Request, res: Response) => {
     res.status(500).json({ 
       success: false,
       message: "Something went wrong",
-      data: [], // keep it consistent
+      data: [], 
       error: err.message,
      });
   }

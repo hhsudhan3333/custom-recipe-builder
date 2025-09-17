@@ -1,15 +1,12 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { v4 as uuidv4 } from 'uuid';
 
-// User interface
 export interface IUser extends Document {
   id: string;
   name: string;
   email: string;
   password: string;
 }
-
-// Schema
 const userSchema: Schema<IUser> = new Schema(
   {
     id: { type: String, unique: true, default: uuidv4 },
@@ -19,6 +16,4 @@ const userSchema: Schema<IUser> = new Schema(
   },
   { timestamps: true }
 );
-
-
 export const User = mongoose.model<IUser>("User", userSchema);
